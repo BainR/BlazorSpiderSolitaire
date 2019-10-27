@@ -47,15 +47,15 @@
     {
         if (PileId > 0)
         {
-            var tempCardList = Container.PlayingCards[PileId - 1].ToList();
+            var tempCardList = Container.TableauPiles[PileId - 1].ToList();
             Cards.Clear();
             Cards.AddRange(tempCardList);
 
-            if (Container.PlayingCards[PileId - 1].Count <= 14)
+            if (Container.TableauPiles[PileId - 1].Count <= 14)
             {
                 stacksize = "small";
             }
-            else if (Container.PlayingCards[PileId - 1].Count <= 21)
+            else if (Container.TableauPiles[PileId - 1].Count <= 21)
             {
                 stacksize = "medium";
             }
@@ -80,19 +80,19 @@
     {
         dropClass = "";
 
-        if (Container.PlayingCards[PileId - 1].Any())
+        if (Container.TableauPiles[PileId - 1].Any())
         {
-            if (Container.PlayingCards[PileId - 1].Last().IsFaceDown ||
-                Container.PlayingCards[PileId - 1].Last().Value != Container.Payload.Value + 1)
+            if (Container.TableauPiles[PileId - 1].Last().IsFaceDown ||
+                Container.TableauPiles[PileId - 1].Last().Value != Container.Payload.Value + 1)
             {
                 return;
             }
         }
 
-        for (int i = Container.Payload.PileSequence; i < Container.PlayingCards[Container.Payload.PileId - 1].Count; i++)
+        for (int i = Container.Payload.PileSequence; i < Container.TableauPiles[Container.Payload.PileId - 1].Count; i++)
         {
-            if (Container.PlayingCards[Container.Payload.PileId - 1][i].Suit != Container.PlayingCards[Container.Payload.PileId - 1][i - 1].Suit
-                || Container.PlayingCards[Container.Payload.PileId - 1][i].Value != Container.PlayingCards[Container.Payload.PileId - 1][i - 1].Value - 1)
+            if (Container.TableauPiles[Container.Payload.PileId - 1][i].Suit != Container.TableauPiles[Container.Payload.PileId - 1][i - 1].Suit
+                || Container.TableauPiles[Container.Payload.PileId - 1][i].Value != Container.TableauPiles[Container.Payload.PileId - 1][i - 1].Value - 1)
             {
                 return;
             }
@@ -103,7 +103,7 @@
 
     private async Task HandleDropToCompleted()
     {
-        if (Container.PlayingCards[CompletedId + 14].Any())
+        if (Container.FoundationPiles[CompletedId - 1].Any())
         {
             return;
         }
@@ -113,14 +113,14 @@
             return;
         }
 
-        if (Container.PlayingCards[Container.Payload.PileId - 1].Count != Container.Payload.PileSequence + 12)
+        if (Container.TableauPiles[Container.Payload.PileId - 1].Count != Container.Payload.PileSequence + 12)
         {
             return;
         }
 
         for (int i = 0; i < 13; i++)
         {
-            if (Container.PlayingCards[Container.Payload.PileId - 1][Container.Payload.PileSequence - 1 + i].Value != 13 - i)
+            if (Container.TableauPiles[Container.Payload.PileId - 1][Container.Payload.PileSequence - 1 + i].Value != 13 - i)
             {
                 return;
             }

@@ -28,14 +28,14 @@
 
     private async Task HandleClick()
     {
-        if (PlayingCardModel.DealId > 1 && Container.PlayingCards[PlayingCardModel.DealId + 8].Any())
+        if (PlayingCardModel.DealId > 1 && Container.StockPiles[PlayingCardModel.DealId - 2].Any())
         {
             return;
         }
 
         for (int i = 0; i < 10; i++)
         {
-            if (!Container.PlayingCards[i].Any())
+            if (!Container.TableauPiles[i].Any())
             {
                 return;
             }
@@ -49,17 +49,17 @@
             Cards = 0
         });
 
-        int dealpileindex = PlayingCardModel.DealId + 9;
+        int stockpileindex = PlayingCardModel.DealId - 1;
         for (int i = 0; i < 10; i++)
         {
-            var card = Container.PlayingCards[dealpileindex][i];
+            var card = Container.StockPiles[stockpileindex][i];
             card.DealId = 0;
             card.PileId = i + 1;
             card.IsFaceDown = false;
-            card.PileSequence = Container.PlayingCards[i].Any() ? Container.PlayingCards[i].Max(c => c.PileSequence) + 1 : 1;
-            Container.PlayingCards[i].Add(card);
+            card.PileSequence = Container.TableauPiles[i].Any() ? Container.TableauPiles[i].Max(c => c.PileSequence) + 1 : 1;
+            Container.TableauPiles[i].Add(card);
         }
-        Container.PlayingCards[dealpileindex].Clear();
+        Container.StockPiles[stockpileindex].Clear();
         await Container.UpdateAllPiles();
     }
 }

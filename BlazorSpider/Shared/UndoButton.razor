@@ -36,24 +36,24 @@
     {
         if (move.TurnFaceDown)
         {
-            Container.PlayingCards[move.FromPileId - 1].Last().IsFaceDown = true;
+            Container.TableauPiles[move.FromPileId - 1].Last().IsFaceDown = true;
         }
 
         for (int i = 0; i < 13; i++)
         {
-            var card = Container.PlayingCards[move.ToPileId + 14][i];
+            var card = Container.FoundationPiles[move.ToPileId -1][i];
             card.CompletedId = 0;
             card.PileId = move.FromPileId;
-            card.PileSequence = Container.PlayingCards[move.FromPileId - 1].Count + 1;
-            Container.PlayingCards[move.FromPileId - 1].Add(card);
+            card.PileSequence = Container.TableauPiles[move.FromPileId - 1].Count + 1;
+            Container.TableauPiles[move.FromPileId - 1].Add(card);
         }
-        Container.PlayingCards[move.ToPileId + 14].Clear();
+        Container.FoundationPiles[move.ToPileId -1].Clear();
     }
 
     void UndoPlay(Move move)
     {
-        var returnToPile = Container.PlayingCards[move.FromPileId - 1];
-        var returnFromPile = Container.PlayingCards[move.ToPileId - 1];
+        var returnToPile = Container.TableauPiles[move.FromPileId - 1];
+        var returnFromPile = Container.TableauPiles[move.ToPileId - 1];
         int returnToPileOffset = returnToPile.Count;
         int returnFromPileOffset = returnFromPile.Count - move.Cards;
 
@@ -74,20 +74,20 @@
     void UndoDeal(Move move)
     {
         int dealId = 5;
-        while (Container.PlayingCards[dealId + 9].Any())
+        while (Container.StockPiles[dealId - 1].Any())
         {
             dealId--;
         }
 
         for (int i = 0; i < 10; i++)
         {
-            var card = Container.PlayingCards[i].Last();
+            var card = Container.TableauPiles[i].Last();
             card.IsFaceDown = true;
             card.PileSequence = i;
             card.DealId = dealId;
             card.PileId = 0;
-            Container.PlayingCards[dealId + 9].Add(card);
-            Container.PlayingCards[i].RemoveAt(Container.PlayingCards[i].Count - 1);
+            Container.StockPiles[dealId - 1].Add(card);
+            Container.TableauPiles[i].RemoveAt(Container.TableauPiles[i].Count - 1);
         }
     }
 }

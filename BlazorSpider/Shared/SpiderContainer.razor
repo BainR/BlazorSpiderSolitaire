@@ -13,6 +13,9 @@
     [Parameter] public EventCallback<PlayingCardModel> OnPilesUpdated { get; set; }
 
     public PlayingCardModel Payload { get; set; }
+    public List<List<PlayingCardModel>> StockPiles  { get { return PlayingCards.GetRange(10, 5); } }
+    public List<List<PlayingCardModel>> FoundationPiles  { get { return PlayingCards.GetRange(15, 8); } }
+    public List<List<PlayingCardModel>> TableauPiles  { get { return PlayingCards.GetRange(0, 10); } }
 
     public async Task UpdatePileIdAsync(int destinationPileId)
     {
@@ -32,26 +35,26 @@
             FromPileId = sourcePileId,
             ToPileId = destinationPileId,
             ToCompletedPile = false,
-            Cards = PlayingCards[sourcePileId - 1].Count - Payload.PileSequence + 1
+            Cards = TableauPiles[sourcePileId - 1].Count - Payload.PileSequence + 1
         });
 
-        for (int i = Payload.PileSequence; i <= PlayingCards[sourcePileId - 1].Last().PileSequence; i++)
+        for (int i = Payload.PileSequence; i <= TableauPiles[sourcePileId - 1].Last().PileSequence; i++)
         {
-            var card = PlayingCards[sourcePileId - 1].Single(c => c.PileSequence == i);
-            PlayingCards[sourcePileId - 1].Remove(card);
+            var card = TableauPiles[sourcePileId - 1].Single(c => c.PileSequence == i);
+            TableauPiles[sourcePileId - 1].Remove(card);
             card.PileId = destinationPileId;
-            card.PileSequence = PlayingCards[destinationPileId - 1].Count + 1;
-            PlayingCards[destinationPileId - 1].Add(card);
+            card.PileSequence = TableauPiles[destinationPileId - 1].Count + 1;
+            TableauPiles[destinationPileId - 1].Add(card);
 
-            if (!PlayingCards[sourcePileId - 1].Any())
+            if (!TableauPiles[sourcePileId - 1].Any())
             {
                 break;
             }
         }
 
-        if (PlayingCards[sourcePileId - 1].Any() && PlayingCards[sourcePileId - 1].Last().IsFaceDown)
+        if (TableauPiles[sourcePileId - 1].Any() && TableauPiles[sourcePileId - 1].Last().IsFaceDown)
         {
-            PlayingCards[sourcePileId - 1].Last().IsFaceDown = false;
+            TableauPiles[sourcePileId - 1].Last().IsFaceDown = false;
             MoveList.Last().TurnFaceDown = true;
         }
 
@@ -74,17 +77,17 @@
 
         for (int i = 0; i < 13; i++)
         {
-            var card = PlayingCards[payloadPileId - 1][payloadPileSequence - 1 + i];
+            var card = TableauPiles[payloadPileId - 1][payloadPileSequence - 1 + i];
             card.PileId = 0;
             card.CompletedId = completedPileId;
             card.PileSequence = i + 1;
-            PlayingCards[completedPileId + 14].Add(card);
+            FoundationPiles[completedPileId - 1].Add(card);
         }
-        PlayingCards[payloadPileId - 1].RemoveRange(payloadPileSequence - 1, 13);
+        TableauPiles[payloadPileId - 1].RemoveRange(payloadPileSequence - 1, 13);
 
-        if (PlayingCards[payloadPileId - 1].Any())
+        if (TableauPiles[payloadPileId - 1].Any())
         {
-            PlayingCards[payloadPileId - 1].Last().IsFaceDown = false;
+            TableauPiles[payloadPileId - 1].Last().IsFaceDown = false;
             MoveList.Last().TurnFaceDown = true;
         }
 
