@@ -1,0 +1,134 @@
+﻿@namespace BlazorSpider.Models
+
+@page "/"
+    <div class="spider-wrapper">
+        <SpiderContainer PlayingCards="Cards" MoveList="Moves" OnPilesUpdated="HandlePilesUpdated">
+            <UndoButton />
+            <div class="support-row">
+                <div class="piles-deal">
+                    <PlayingCardList DealId=5 Cards="Cards[14]" />
+                    <PlayingCardList DealId=4 Cards="Cards[13]" />
+                    <PlayingCardList DealId=3 Cards="Cards[12]" />
+                    <PlayingCardList DealId=2 Cards="Cards[11]" />
+                    <PlayingCardList DealId=1 Cards="Cards[10]" />
+                </div>
+                <PlayingCardList CompletedId=1 Cards="Cards[15]" />
+                <PlayingCardList CompletedId=2 Cards="Cards[16]" />
+                <PlayingCardList CompletedId=3 Cards="Cards[17]" />
+                <PlayingCardList CompletedId=4 Cards="Cards[18]" />
+                <PlayingCardList CompletedId=5 Cards="Cards[19]" />
+                <PlayingCardList CompletedId=6 Cards="Cards[20]" />
+                <PlayingCardList CompletedId=7 Cards="Cards[21]" />
+                <PlayingCardList CompletedId=8 Cards="Cards[22]" />
+            </div>
+            <div class="play-row">
+                <PlayingCardList PileId=1 Cards="Cards[0]" />
+                <PlayingCardList PileId=2 Cards="Cards[1]" />
+                <PlayingCardList PileId=3 Cards="Cards[2]" />
+                <PlayingCardList PileId=4 Cards="Cards[3]" />
+                <PlayingCardList PileId=5 Cards="Cards[4]" />
+                <PlayingCardList PileId=6 Cards="Cards[5]" />
+                <PlayingCardList PileId=7 Cards="Cards[6]" />
+                <PlayingCardList PileId=8 Cards="Cards[7]" />
+                <PlayingCardList PileId=9 Cards="Cards[8]" />
+                <PlayingCardList PileId=10 Cards="Cards[9]" />
+            </div>
+        </SpiderContainer>
+    </div>
+@code {
+    List<List<PlayingCardModel>> Cards = new List<List<PlayingCardModel>>();
+    List<Move> Moves = new List<Move>();
+
+    protected override void OnInitialized()
+    {
+        var decks = new List<PlayingCardModel>();
+        for (int i = 0; i < 104; i++)
+        {
+            var card = new PlayingCardModel
+            {
+                Id = i + 1,
+                IsFaceDown = true,
+                Suit = i < 52 ? Suit.Spade : Suit.Heart,
+                Value = (i % 13) + 1
+            };
+            decks.Add(card);
+        }
+
+        Shuffle(decks);
+
+        for (int i = 0; i < 10; i++)
+        {
+            Cards.Add(new List<PlayingCardModel>());
+            for (int j = 0; j < 4; j++)
+            {
+                decks[10 * j + i].IsFaceDown = true;
+                decks[10 * j + i].PileId = i + 1;
+                decks[10 * j + i].PileSequence = j + 1;
+                Cards[i].Add(decks[10 * j + i]);
+            }
+        }
+
+        decks[40].IsFaceDown = true;
+        decks[40].PileId = 1;
+        decks[40].PileSequence = 5;
+        Cards[0].Add(decks[40]);
+
+        decks[41].IsFaceDown = true;
+        decks[41].PileId = 4;
+        decks[41].PileSequence = 5;
+        Cards[3].Add(decks[41]);
+
+        decks[42].IsFaceDown = true;
+        decks[42].PileId = 7;
+        decks[42].PileSequence = 5;
+        Cards[6].Add(decks[42]);
+
+        decks[43].IsFaceDown = true;
+        decks[43].PileId = 10;
+        decks[43].PileSequence = 5;
+        Cards[9].Add(decks[43]);
+
+        for (int i = 0; i < 10; i++)
+        {
+            decks[44 + i].IsFaceDown = false;
+            decks[44 + i].PileId = i + 1;
+            decks[44 + i].PileSequence = Cards[i].Count + 1;
+            Cards[i].Add(decks[44 + i]);
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            Cards.Add(new List<PlayingCardModel>());
+            for (int j = 0; j < 10; j++)
+            {
+                decks[54 + 10 * i + j].IsFaceDown = true;
+                decks[54 + 10 * i + j].DealId = i + 1;
+                Cards[10 + i].Add(decks[54 + 10 * i + j]);
+            }
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            Cards.Add(new List<PlayingCardModel>());
+        }
+    }
+
+    void HandlePilesUpdated(PlayingCardModel updatedPlayingCard)
+    {
+        // Called by SpiderContainer.UpdatePileIdAsync
+        // Calling this triggers the PlayingCardList.OnParameterSet method that refreshes the piles.
+    }
+
+    void Shuffle(List<PlayingCardModel> deck)
+    {
+        Random r = new Random();
+
+        for (int n = deck.Count - 1; n > 0; --n)
+        {
+            int k = r.Next(n+1);
+            PlayingCardModel temp = deck[n];
+            deck[n] = deck[k];
+            deck[k] = temp;
+        }
+    }
+}

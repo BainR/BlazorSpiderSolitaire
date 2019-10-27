@@ -1,0 +1,98 @@
+﻿@namespace BlazorSpider.Models
+
+<div class="spider-container">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public List<List<PlayingCardModel>> PlayingCards { get; set; }
+    [Parameter] public List<Move> MoveList { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public EventCallback<PlayingCardModel> OnPilesUpdated { get; set; }
+
+    public PlayingCardModel Payload { get; set; }
+
+    public async Task UpdatePileIdAsync(int destinationPileId)
+    {
+        // Called by PlayingCardList.HandleDrop
+        // newPileId is the PileId of the column of the drop.
+        // Payload was set in PlayingCard.HandleDragStart.  Value is the card being dragged.
+
+        int sourcePileId = Payload.PileId;
+
+        if (sourcePileId == destinationPileId)
+        {
+            return;
+        }
+
+        MoveList.Add(new Move
+        {
+            FromPileId = sourcePileId,
+            ToPileId = destinationPileId,
+            ToCompletedPile = false,
+            Cards = PlayingCards[sourcePileId - 1].Count - Payload.PileSequence + 1
+        });
+
+        for (int i = Payload.PileSequence; i <= PlayingCards[sourcePileId - 1].Last().PileSequence; i++)
+        {
+            var card = PlayingCards[sourcePileId - 1].Single(c => c.PileSequence == i);
+            PlayingCards[sourcePileId - 1].Remove(card);
+            card.PileId = destinationPileId;
+            card.PileSequence = PlayingCards[destinationPileId - 1].Count + 1;
+            PlayingCards[destinationPileId - 1].Add(card);
+
+            if (!PlayingCards[sourcePileId - 1].Any())
+            {
+                break;
+            }
+        }
+
+        if (PlayingCards[sourcePileId - 1].Any() && PlayingCards[sourcePileId - 1].Last().IsFaceDown)
+        {
+            PlayingCards[sourcePileId - 1].Last().IsFaceDown = false;
+            MoveList.Last().TurnFaceDown = true;
+        }
+
+        // This needs to be called in order for PlayingCardList.OnParameterSet to be called.  That refreshes the piles.
+        await OnPilesUpdated.InvokeAsync(Payload);
+    }
+
+    public async Task UpdateCompletedAsync(int completedPileId)
+    {
+        int payloadPileSequence = Payload.PileSequence;
+        int payloadPileId = Payload.PileId;
+
+        MoveList.Add(new Move
+        {
+            FromPileId = payloadPileId,
+            ToPileId = completedPileId,
+            ToCompletedPile = true,
+            Cards = 13
+        });
+
+        for (int i = 0; i < 13; i++)
+        {
+            var card = PlayingCards[payloadPileId - 1][payloadPileSequence - 1 + i];
+            card.PileId = 0;
+            card.CompletedId = completedPileId;
+            card.PileSequence = i + 1;
+            PlayingCards[completedPileId + 14].Add(card);
+        }
+        PlayingCards[payloadPileId - 1].RemoveRange(payloadPileSequence - 1, 13);
+
+        if (PlayingCards[payloadPileId - 1].Any())
+        {
+            PlayingCards[payloadPileId - 1].Last().IsFaceDown = false;
+            MoveList.Last().TurnFaceDown = true;
+        }
+
+        await OnPilesUpdated.InvokeAsync(null);
+    }
+
+    public async Task UpdateAllPiles()
+    {
+        await OnPilesUpdated.InvokeAsync(null);
+    }
+}

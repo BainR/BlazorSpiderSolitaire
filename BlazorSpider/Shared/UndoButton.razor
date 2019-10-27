@@ -1,0 +1,93 @@
+﻿@namespace BlazorSpider.Models
+
+    <button class="undoButton" @onclick="@((e) => HandleUndo())">Undo</button>
+
+@code {
+    [CascadingParameter] SpiderContainer Container { get; set; }
+
+    async Task HandleUndo()
+    {
+        if (!Container.MoveList.Any())
+        {
+            return;
+        }
+
+        Move move = Container.MoveList.Last();
+
+        Container.MoveList.RemoveAt(Container.MoveList.Count - 1);
+
+        if (move.ToCompletedPile)
+        {
+            UndoMoveToCompleted(move);
+        }
+        else if (move.Cards > 0)
+        {
+            UndoPlay(move);
+        }
+        else
+        {
+            UndoDeal(move);
+        }
+
+        await Container.OnPilesUpdated.InvokeAsync(null);
+    }
+
+    void UndoMoveToCompleted(Move move)
+    {
+        if (move.TurnFaceDown)
+        {
+            Container.PlayingCards[move.FromPileId - 1].Last().IsFaceDown = true;
+        }
+
+        for (int i = 0; i < 13; i++)
+        {
+            var card = Container.PlayingCards[move.ToPileId + 14][i];
+            card.CompletedId = 0;
+            card.PileId = move.FromPileId;
+            card.PileSequence = Container.PlayingCards[move.FromPileId - 1].Count + 1;
+            Container.PlayingCards[move.FromPileId - 1].Add(card);
+        }
+        Container.PlayingCards[move.ToPileId + 14].Clear();
+    }
+
+    void UndoPlay(Move move)
+    {
+        var returnToPile = Container.PlayingCards[move.FromPileId - 1];
+        var returnFromPile = Container.PlayingCards[move.ToPileId - 1];
+        int returnToPileOffset = returnToPile.Count;
+        int returnFromPileOffset = returnFromPile.Count - move.Cards;
+
+        for (int i = 0; i < move.Cards; i++)
+        {
+            returnToPile.Add(returnFromPile[returnFromPileOffset + i]);
+            returnToPile.Last().PileId = move.FromPileId;
+            returnToPile.Last().PileSequence = returnToPile.Count();
+        }
+        returnFromPile.RemoveRange(returnFromPileOffset, move.Cards);
+
+        if (move.TurnFaceDown)
+        {
+            returnToPile[returnToPileOffset - 1].IsFaceDown = true;
+        }
+    }
+
+    void UndoDeal(Move move)
+    {
+        int dealId = 5;
+        while (Container.PlayingCards[dealId + 9].Any())
+        {
+            dealId--;
+        }
+
+        for (int i = 0; i < 10; i++)
+        {
+            var card = Container.PlayingCards[i].Last();
+            card.IsFaceDown = true;
+            card.PileSequence = i;
+            card.DealId = dealId;
+            card.PileId = 0;
+            Container.PlayingCards[dealId + 9].Add(card);
+            Container.PlayingCards[i].RemoveAt(Container.PlayingCards[i].Count - 1);
+        }
+    }
+}
