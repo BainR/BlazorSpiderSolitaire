@@ -62,7 +62,7 @@ app {
     max-width: calc(1.5 * (100vh - 6em));
 }
 
-.support-row {
+.stock-foundation-row {
     display: grid;
     grid-template-columns: repeat(10, 10%);
     width: 100%;
@@ -70,117 +70,117 @@ app {
     max-height: calc((100vw - 5em) / 10 * 3.5 / 2.5);
 }
 
-.play-row {
+.tableau-row {
     display: grid;
     grid-template-columns: repeat(10, 10%);
     height: calc((100vh - 6em) - (1.5 * (100vh - 6em) / 10 * 3.5 / 2.5));
     width: 100%;
 }
 
-.piles-deal {
+.stock {
     grid-area: 1 / 1 / 2 / 3;
     display: grid;
     grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
     grid-template-rows: 100%;
 }
 
-.deal-5 {
+.stock-5 {
     grid-area: 1 / 1 / 2 / 5;
 }
 
-.deal-4 {
+.stock-4 {
     grid-area: 1 / 2 / 2 / 6;
 }
 
-.deal-3 {
+.stock-3 {
     grid-area: 1 / 3 / 2 / 7;
 }
 
-.deal-2 {
+.stock-2 {
     grid-area: 1 / 4 / 2 / 8;
 }
 
-.deal-1 {
+.stock-1 {
     grid-area: 1 / 5 / 2 / 9;
 }
 
-.completed-1 {
+.foundation-1 {
     grid-area: 1 / 3 / 2 / 4;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-2 {
+.foundation-2 {
     grid-area: 1 / 4 / 2 / 5;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-3 {
+.foundation-3 {
     grid-area: 1 / 5 / 2 / 6;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-4 {
+.foundation-4 {
     grid-area: 1 / 6 / 2 / 7;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-5 {
+.foundation-5 {
     grid-area: 1 / 7 / 2 / 8;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-6 {
+.foundation-6 {
     grid-area: 1 / 8 / 2 / 9;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-7 {
+.foundation-7 {
     grid-area: 1 / 9 / 2 / 10;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.completed-8 {
+.foundation-8 {
     grid-area: 1 / 10 / 2 / 11;
     background-image: radial-gradient(greenyellow, forestgreen);
 }
 
-.play-1 {
+.tableau-1 {
     grid-area: 1 / 1 / 2 / 2;
 }
 
-.play-2 {
+.tableau-2 {
     grid-area: 1 / 2 / 2 / 3;
 }
 
-.play-3 {
+.tableau-3 {
     grid-area: 1 / 3 / 2 / 4;
 }
 
-.play-4 {
+.tableau-4 {
     grid-area: 1 / 4 / 2 / 5;
 }
 
-.play-5 {
+.tableau-5 {
     grid-area: 1 / 5 / 2 / 6;
 }
 
-.play-6 {
+.tableau-6 {
     grid-area: 1 / 6 / 2 / 7;
 }
 
-.play-7 {
+.tableau-7 {
     grid-area: 1 / 7 / 2 / 8;
 }
 
-.play-8 {
+.tableau-8 {
     grid-area: 1 / 8 / 2 / 9;
 }
 
-.play-9 {
+.tableau-9 {
     grid-area: 1 / 9 / 2 / 10;
 }
 
-.play-10 {
+.tableau-10 {
     grid-area: 1 / 10 / 2 / 11;
 }
 

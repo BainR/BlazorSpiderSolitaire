@@ -1,18 +1,18 @@
 ﻿@namespace BlazorSpider.Models
 
-@if (PlayingCardModel.PileId > 0)
+@if (PlayingCardModel.TableauId > 0)
 {
     <div id="@PlayingCardModel.Id" class="spider-column sequence-@PlayingCardModel.PileSequence" draggable="true" @ondragstart="@((e) => HandleDragStart(@PlayingCardModel))">
         <img class="playing-card" src="@PlayingCardModel.ImageUrl" alt="@PlayingCardModel.Description" title="@PlayingCardModel.Description" />
     </div>
 }
 
-@if (PlayingCardModel.DealId > 0)
+@if (PlayingCardModel.StockId > 0)
 {
     <img class="playing-card" src="@PlayingCardModel.ImageUrl" alt="@PlayingCardModel.Description" title="@PlayingCardModel.Description" @onclick="@((e) => HandleClick())" />
 }
 
-@if (PlayingCardModel.CompletedId > 0)
+@if (PlayingCardModel.FoundationId > 0)
 {
     <img class="playing-card" src="@PlayingCardModel.ImageUrl" alt="@PlayingCardModel.Description" title="@PlayingCardModel.Description" />
 }
@@ -28,7 +28,7 @@
 
     private async Task HandleClick()
     {
-        if (PlayingCardModel.DealId > 1 && Container.StockPiles[PlayingCardModel.DealId - 2].Any())
+        if (PlayingCardModel.StockId > 1 && Container.StockPiles[PlayingCardModel.StockId - 2].Any())
         {
             return;
         }
@@ -43,18 +43,18 @@
 
         Container.MoveList.Add(new Move
         {
-            FromPileId = 0,
+            FromTableauId = 0,
             ToPileId = 0,
-            ToCompletedPile = false,
+            ToFoundationPile = false,
             Cards = 0
         });
 
-        int stockpileindex = PlayingCardModel.DealId - 1;
+        int stockpileindex = PlayingCardModel.StockId - 1;
         for (int i = 0; i < 10; i++)
         {
             var card = Container.StockPiles[stockpileindex][i];
-            card.DealId = 0;
-            card.PileId = i + 1;
+            card.StockId = 0;
+            card.TableauId = i + 1;
             card.IsFaceDown = false;
             card.PileSequence = Container.TableauPiles[i].Any() ? Container.TableauPiles[i].Max(c => c.PileSequence) + 1 : 1;
             Container.TableauPiles[i].Add(card);

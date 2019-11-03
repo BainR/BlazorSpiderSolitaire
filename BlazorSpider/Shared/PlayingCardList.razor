@@ -1,8 +1,8 @@
 ﻿@namespace BlazorSpider.Models
 
-@if (PileId > 0)
+@if (TableauId > 0)
 {
-    <div class="play-@PileId dropzone @dropClass" ondragover="event.preventDefault();"
+    <div class="tableau-@TableauId dropzone @dropClass" ondragover="event.preventDefault();"
          @ondrop="HandleDrop"
          @ondragenter="HandleDragEnter"
          @ondragleave="HandleDragLeave">
@@ -15,17 +15,17 @@
     </div>
 }
 
-@if (DealId > 0 && Cards.Any())
+@if (StockId > 0 && Cards.Any())
 {
-    <div class="deal-@DealId">
+    <div class="stock-@StockId">
         <PlayingCard PlayingCardModel="Cards[0]" />
     </div>
 }
 
-@if (CompletedId > 0)
+@if (FoundationId > 0)
 {
-<div class="completed-@CompletedId dropzone @dropClass" ondragover="event.preventDefault();"
-     @ondrop="HandleDropToCompleted">
+<div class="foundation-@FoundationId dropzone @dropClass" ondragover="event.preventDefault();"
+     @ondrop="HandleDropToFoundation">
     @if (Cards.Any())
     {
         <PlayingCard PlayingCardModel="Cards.Last()" />
@@ -36,26 +36,26 @@
 @code {
 
     [CascadingParameter] SpiderContainer Container { get; set; }
-    [Parameter] public int PileId { get; set; }
-    [Parameter] public int DealId { get; set; }
-    [Parameter] public int CompletedId { get; set; }
+    [Parameter] public int TableauId { get; set; }
+    [Parameter] public int StockId { get; set; }
+    [Parameter] public int FoundationId { get; set; }
     [Parameter] public List<PlayingCardModel> Cards { get; set; }
     string dropClass = "";
     string stacksize = "small";
 
     protected override void OnParametersSet()
     {
-        if (PileId > 0)
+        if (TableauId > 0)
         {
-            var tempCardList = Container.TableauPiles[PileId - 1].ToList();
+            var tempCardList = Container.TableauPiles[TableauId - 1].ToList();
             Cards.Clear();
             Cards.AddRange(tempCardList);
 
-            if (Container.TableauPiles[PileId - 1].Count <= 14)
+            if (Container.TableauPiles[TableauId - 1].Count <= 14)
             {
                 stacksize = "small";
             }
-            else if (Container.TableauPiles[PileId - 1].Count <= 21)
+            else if (Container.TableauPiles[TableauId - 1].Count <= 21)
             {
                 stacksize = "medium";
             }
@@ -80,30 +80,30 @@
     {
         dropClass = "";
 
-        if (Container.TableauPiles[PileId - 1].Any())
+        if (Container.TableauPiles[TableauId - 1].Any())
         {
-            if (Container.TableauPiles[PileId - 1].Last().IsFaceDown ||
-                Container.TableauPiles[PileId - 1].Last().Value != Container.Payload.Value + 1)
+            if (Container.TableauPiles[TableauId - 1].Last().IsFaceDown ||
+                Container.TableauPiles[TableauId - 1].Last().Value != Container.Payload.Value + 1)
             {
                 return;
             }
         }
 
-        for (int i = Container.Payload.PileSequence; i < Container.TableauPiles[Container.Payload.PileId - 1].Count; i++)
+        for (int i = Container.Payload.PileSequence; i < Container.TableauPiles[Container.Payload.TableauId - 1].Count; i++)
         {
-            if (Container.TableauPiles[Container.Payload.PileId - 1][i].Suit != Container.TableauPiles[Container.Payload.PileId - 1][i - 1].Suit
-                || Container.TableauPiles[Container.Payload.PileId - 1][i].Value != Container.TableauPiles[Container.Payload.PileId - 1][i - 1].Value - 1)
+            if (Container.TableauPiles[Container.Payload.TableauId - 1][i].Suit != Container.TableauPiles[Container.Payload.TableauId - 1][i - 1].Suit
+                || Container.TableauPiles[Container.Payload.TableauId - 1][i].Value != Container.TableauPiles[Container.Payload.TableauId - 1][i - 1].Value - 1)
             {
                 return;
             }
         }
 
-        await Container.UpdatePileIdAsync(PileId);
+        await Container.UpdateTableauIdAsync(TableauId);
     }
 
-    private async Task HandleDropToCompleted()
+    private async Task HandleDropToFoundation()
     {
-        if (Container.FoundationPiles[CompletedId - 1].Any())
+        if (Container.FoundationPiles[FoundationId - 1].Any())
         {
             return;
         }
@@ -113,19 +113,19 @@
             return;
         }
 
-        if (Container.TableauPiles[Container.Payload.PileId - 1].Count != Container.Payload.PileSequence + 12)
+        if (Container.TableauPiles[Container.Payload.TableauId - 1].Count != Container.Payload.PileSequence + 12)
         {
             return;
         }
 
         for (int i = 0; i < 13; i++)
         {
-            if (Container.TableauPiles[Container.Payload.PileId - 1][Container.Payload.PileSequence - 1 + i].Value != 13 - i)
+            if (Container.TableauPiles[Container.Payload.TableauId - 1][Container.Payload.PileSequence - 1 + i].Value != 13 - i)
             {
                 return;
             }
         }
 
-        await Container.UpdateCompletedAsync(CompletedId);
+        await Container.UpdateFoundationAsync(FoundationId);
     }
 }

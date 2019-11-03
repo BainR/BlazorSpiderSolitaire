@@ -16,9 +16,9 @@
 
         Container.MoveList.RemoveAt(Container.MoveList.Count - 1);
 
-        if (move.ToCompletedPile)
+        if (move.ToFoundationPile)
         {
-            UndoMoveToCompleted(move);
+            UndoMoveToFoundation(move);
         }
         else if (move.Cards > 0)
         {
@@ -32,27 +32,27 @@
         await Container.OnPilesUpdated.InvokeAsync(null);
     }
 
-    void UndoMoveToCompleted(Move move)
+    void UndoMoveToFoundation(Move move)
     {
         if (move.TurnFaceDown)
         {
-            Container.TableauPiles[move.FromPileId - 1].Last().IsFaceDown = true;
+            Container.TableauPiles[move.FromTableauId - 1].Last().IsFaceDown = true;
         }
 
         for (int i = 0; i < 13; i++)
         {
             var card = Container.FoundationPiles[move.ToPileId -1][i];
-            card.CompletedId = 0;
-            card.PileId = move.FromPileId;
-            card.PileSequence = Container.TableauPiles[move.FromPileId - 1].Count + 1;
-            Container.TableauPiles[move.FromPileId - 1].Add(card);
+            card.FoundationId = 0;
+            card.TableauId = move.FromTableauId;
+            card.PileSequence = Container.TableauPiles[move.FromTableauId - 1].Count + 1;
+            Container.TableauPiles[move.FromTableauId - 1].Add(card);
         }
         Container.FoundationPiles[move.ToPileId -1].Clear();
     }
 
     void UndoPlay(Move move)
     {
-        var returnToPile = Container.TableauPiles[move.FromPileId - 1];
+        var returnToPile = Container.TableauPiles[move.FromTableauId - 1];
         var returnFromPile = Container.TableauPiles[move.ToPileId - 1];
         int returnToPileOffset = returnToPile.Count;
         int returnFromPileOffset = returnFromPile.Count - move.Cards;
@@ -60,7 +60,7 @@
         for (int i = 0; i < move.Cards; i++)
         {
             returnToPile.Add(returnFromPile[returnFromPileOffset + i]);
-            returnToPile.Last().PileId = move.FromPileId;
+            returnToPile.Last().TableauId = move.FromTableauId;
             returnToPile.Last().PileSequence = returnToPile.Count();
         }
         returnFromPile.RemoveRange(returnFromPileOffset, move.Cards);
@@ -73,10 +73,10 @@
 
     void UndoDeal(Move move)
     {
-        int dealId = 5;
-        while (Container.StockPiles[dealId - 1].Any())
+        int stockId = 5;
+        while (Container.StockPiles[stockId - 1].Any())
         {
-            dealId--;
+            stockId--;
         }
 
         for (int i = 0; i < 10; i++)
@@ -84,9 +84,9 @@
             var card = Container.TableauPiles[i].Last();
             card.IsFaceDown = true;
             card.PileSequence = i;
-            card.DealId = dealId;
-            card.PileId = 0;
-            Container.StockPiles[dealId - 1].Add(card);
+            card.StockId = stockId;
+            card.TableauId = 0;
+            Container.StockPiles[stockId - 1].Add(card);
             Container.TableauPiles[i].RemoveAt(Container.TableauPiles[i].Count - 1);
         }
     }

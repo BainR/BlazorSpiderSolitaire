@@ -7,9 +7,9 @@ namespace BlazorSpider.Models
 {
     public class Move
     {
-        public int FromPileId { get; set; }
+        public int FromTableauId { get; set; }
         public int ToPileId { get; set; }
-        public bool ToCompletedPile { get; set; }
+        public bool ToFoundationPile { get; set; }
         public bool TurnFaceDown { get; set; }
         public int Cards { get; set; }
     }
